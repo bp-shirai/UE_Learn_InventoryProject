@@ -2,12 +2,29 @@
 
 #include "Player/Inv_PlayerController.h"
 
+#include "Components/ActorComponent.h"
+#include "Engine/HitResult.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "InputMappingContext.h"
 
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
+#include "Interaction/Inv_Highlightable.h"
+#include "Items/Components/Inv_ItemComponent.h"
+#include "Interaction/Inv_HighlightableStaticMesh.h"
+#include "Kismet/GameplayStatics.h"
+#include "UObject/Object.h"
+#include "UnrealClient.h"
+
 #include "Widgets/HUD/Inv_HUDWidget.h"
+
+AInv_PlayerController::AInv_PlayerController()
+{
+    PrimaryActorTick.bCanEverTick = true;
+    // PrimaryActorTick.TickInterval = 0.0f; // 毎フレーム（デフォルト）
+}
 
 void AInv_PlayerController::BeginPlay()
 {
@@ -53,4 +70,69 @@ void AInv_PlayerController::CreateHUDWidget()
             HUDWidget->AddToViewport(0);
         }
     }
+    else
+    {
+        PrimaryActorTick.bCanEverTick = false;
+    }
+}
+
+void AInv_PlayerController::TraceForItem()
+{
+    if (!IsValid(GEngine) || !IsValid(GEngine->GameViewport)) return;
+
+    FVector2D ViewportSize;
+    GEngine->GameViewport->GetViewportSize(ViewportSize);
+    const FVector2D ViewportCenter = ViewportSize / 2.f;
+
+    FVector TraceStart;
+    FVector Forward;
+    if (UGameplayStatics::DeprojectScreenToWorld(this, ViewportCenter, TraceStart, Forward))
+    {
+        const FVector TraceEnd = TraceStart + Forward * TraceLength;
+
+        FHitResult HitResult;
+        GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ItemTraceChannel);
+
+        LastActor = ThisActor;
+        ThisActor = HitResult.GetActor();
+
+        if (!ThisActor.IsValid())
+        {
+            if (IsValid(HUDWidget)) HUDWidget->HidePickupMessage();
+        }
+
+        if (ThisActor == LastActor) return;
+
+        if (ThisActor.IsValid())
+        {
+            // UE_LOG(LogTemp, Warning, TEXT("Started tracing a new actor."));
+
+            if (UActorComponent* Highlightable = ThisActor->FindComponentByInterface(UInv_Highlightable::StaticClass()); IsValid(Highlightable))
+            {
+                IInv_Highlightable::Execute_Highlight(Highlightable);
+            }
+
+            UInv_ItemComponent* ItemComponent = ThisActor->FindComponentByClass<UInv_ItemComponent>();
+            if (IsValid(ItemComponent))
+            {
+                if (IsValid(HUDWidget)) HUDWidget->ShowPickupMessage(ItemComponent->GetPickupMessage());
+            }
+        }
+
+        if (LastActor.IsValid())
+        {
+            // UE_LOG(LogTemp, Warning, TEXT("Stopped tracing last actor."));
+            if (UActorComponent* Highlightable = LastActor->FindComponentByInterface(UInv_Highlightable::StaticClass()); IsValid(Highlightable))
+            {
+                IInv_Highlightable::Execute_UnHighlight(Highlightable);
+            }
+        }
+    }
+}
+
+void AInv_PlayerController::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    TraceForItem();
 }
