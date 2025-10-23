@@ -9,6 +9,7 @@
 class UInputMappingContext;
 class UInputAction;
 class UInv_HUDWidget;
+class UInv_InventoryComponent;
 
 /**
  *
@@ -22,22 +23,32 @@ public:
 
 protected:
     virtual void BeginPlay() override;
-    
+
     /** Input mapping context setup */
     virtual void SetupInputComponent() override;
 
     virtual void Tick(float DeltaTime) override;
 
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    void ToggleInventoryMenu();
+
+    
 private:
-    void Input_PrimaryInteract();
+    void PrimaryInteract();
+    
     void CreateHUDWidget();
     void TraceForItem();
-    
+
+    TWeakObjectPtr<UInv_InventoryComponent> InventoryComponent;
+
     UPROPERTY(EditDefaultsOnly, Category = "Inventory")
     TArray<TObjectPtr<UInputMappingContext>> DefaultMappingContexts;
 
     UPROPERTY(EditDefaultsOnly, Category = "Inventory")
     TObjectPtr<UInputAction> PrimaryInteractAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Inventory")
+    TObjectPtr<UInputAction> ToggleInventoryMenuAction;
 
     UPROPERTY(EditDefaultsOnly, Category = "Inventory")
     TSubclassOf<UInv_HUDWidget> HUDWidgetClass;
@@ -53,6 +64,4 @@ private:
 
     TWeakObjectPtr<AActor> ThisActor;
     TWeakObjectPtr<AActor> LastActor;
-
-  
 };

@@ -12,6 +12,7 @@
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
 #include "Interaction/Inv_Highlightable.h"
+#include "InventoryManagement/Components/Inv_InventoryComponent.h"
 #include "Items/Components/Inv_ItemComponent.h"
 #include "Interaction/Inv_HighlightableStaticMesh.h"
 #include "Kismet/GameplayStatics.h"
@@ -29,6 +30,8 @@ AInv_PlayerController::AInv_PlayerController()
 void AInv_PlayerController::BeginPlay()
 {
     Super::BeginPlay();
+
+    InventoryComponent = FindComponentByClass<UInv_InventoryComponent>();
 
     CreateHUDWidget();
 }
@@ -51,13 +54,14 @@ void AInv_PlayerController::SetupInputComponent()
 
         UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
-        EnhancedInputComponent->BindAction(PrimaryInteractAction, ETriggerEvent::Started, this, &ThisClass::Input_PrimaryInteract);
+        EnhancedInputComponent->BindAction(PrimaryInteractAction, ETriggerEvent::Started, this, &ThisClass::PrimaryInteract);
+        EnhancedInputComponent->BindAction(ToggleInventoryMenuAction, ETriggerEvent::Started, this, &ThisClass::ToggleInventoryMenu);
     }
 }
 
-void AInv_PlayerController::Input_PrimaryInteract()
+void AInv_PlayerController::PrimaryInteract()
 {
-    UE_LOG(LogTemp, Log, TEXT("AInv_PlayerController::Input_PrimaryInteract"));
+    UE_LOG(LogTemp, Log, TEXT("AInv_PlayerController::PrimaryInteract"));
 }
 
 void AInv_PlayerController::CreateHUDWidget()
@@ -136,3 +140,12 @@ void AInv_PlayerController::Tick(float DeltaTime)
 
     TraceForItem();
 }
+
+void AInv_PlayerController::ToggleInventoryMenu()
+{
+    if (UInv_InventoryComponent* Inventory = InventoryComponent.Get())
+    {
+        Inventory->ToggleInventoryMenu();
+    }
+}
+

@@ -8,34 +8,31 @@
 
 class UInv_InventoryBase;
 
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent), Blueprintable)
 class INVENTORY_API UInv_InventoryComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
+public:
+    UInv_InventoryComponent();
 
-	UInv_InventoryComponent();
+    void ToggleInventoryMenu();
 
 protected:
-	
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
 private:
+    void ConstructInventory();
 
-	void ConstructInventory();
+    TWeakObjectPtr<APlayerController> OwningPlayerController;
 
+    UPROPERTY(Transient)
+    TObjectPtr<UInv_InventoryBase> InventoryMenu;
 
-	TWeakObjectPtr<APlayerController> OwningPlayerController;
+    UPROPERTY(EditAnywhere, Category = "Inventory")
+    TSubclassOf<UInv_InventoryBase> InventoryMenuClass;
 
-
-	UPROPERTY(Transient)
-	TObjectPtr<UInv_InventoryBase> InventoryMenu;
-
-
-	UPROPERTY(EditAnywhere, Category = "Inventory")
-	TSubclassOf<UInv_InventoryBase> InventoryMenuClass;
-
-	
+    bool bInventoryMenuOpen;
+    void OpenInventoryMenu();
+    void CloseInventoryMenu();
 };
