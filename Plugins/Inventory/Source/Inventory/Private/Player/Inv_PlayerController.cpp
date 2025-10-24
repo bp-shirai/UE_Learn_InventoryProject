@@ -61,7 +61,16 @@ void AInv_PlayerController::SetupInputComponent()
 
 void AInv_PlayerController::PrimaryInteract()
 {
-    UE_LOG(LogTemp, Log, TEXT("AInv_PlayerController::PrimaryInteract"));
+    // UE_LOG(LogTemp, Log, TEXT("AInv_PlayerController::PrimaryInteract"));
+
+    if (!ThisActor.IsValid()) return;
+
+    UInv_ItemComponent* ItemComp           = ThisActor->FindComponentByClass<UInv_ItemComponent>();
+    UInv_InventoryComponent* InventoryComp = InventoryComponent.Get();
+    if (ItemComp && InventoryComp)
+    {
+        InventoryComp->TryAddItem(ItemComp);
+    }
 }
 
 void AInv_PlayerController::CreateHUDWidget()
@@ -100,10 +109,10 @@ void AInv_PlayerController::TraceForItem()
         LastActor = ThisActor;
         ThisActor = HitResult.GetActor();
 
-        if (!ThisActor.IsValid())
-        {
-            if (IsValid(HUDWidget)) HUDWidget->HidePickupMessage();
-        }
+        // if (!ThisActor.IsValid())
+        // {
+        //     if (IsValid(HUDWidget)) HUDWidget->HidePickupMessage();
+        // }
 
         if (ThisActor == LastActor) return;
 
@@ -116,10 +125,10 @@ void AInv_PlayerController::TraceForItem()
                 IInv_Highlightable::Execute_Highlight(Highlightable);
             }
 
-            UInv_ItemComponent* ItemComponent = ThisActor->FindComponentByClass<UInv_ItemComponent>();
-            if (IsValid(ItemComponent))
+            UInv_ItemComponent* ItemComp = ThisActor->FindComponentByClass<UInv_ItemComponent>();
+            if (ItemComp)
             {
-                if (IsValid(HUDWidget)) HUDWidget->ShowPickupMessage(ItemComponent->GetPickupMessage());
+                if (HUDWidget) HUDWidget->ShowPickupMessage(ItemComp->GetPickupMessage());
             }
         }
 
@@ -130,6 +139,8 @@ void AInv_PlayerController::TraceForItem()
             {
                 IInv_Highlightable::Execute_UnHighlight(Highlightable);
             }
+
+            if (HUDWidget) HUDWidget->HidePickupMessage();
         }
     }
 }
@@ -143,9 +154,9 @@ void AInv_PlayerController::Tick(float DeltaTime)
 
 void AInv_PlayerController::ToggleInventoryMenu()
 {
-    if (UInv_InventoryComponent* Inventory = InventoryComponent.Get())
+    UInv_InventoryComponent* InventoryComp = InventoryComponent.Get();
+    if (InventoryComp)
     {
-        Inventory->ToggleInventoryMenu();
+        InventoryComp->ToggleInventoryMenu();
     }
 }
-

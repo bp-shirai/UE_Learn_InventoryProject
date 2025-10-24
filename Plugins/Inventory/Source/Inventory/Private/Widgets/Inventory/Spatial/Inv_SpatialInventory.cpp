@@ -14,6 +14,8 @@ void UInv_SpatialInventory::NativeOnInitialized()
     Button_Equippables->OnClicked.AddDynamic(this, &ThisClass::ShowEquippables);
     Button_Consumables->OnClicked.AddDynamic(this, &ThisClass::ShowConsumables);
     Button_Craftables->OnClicked.AddDynamic(this, &ThisClass::ShowCraftables);
+
+    ShowEquippables();
 }
 
 void UInv_SpatialInventory::ShowEquippables()

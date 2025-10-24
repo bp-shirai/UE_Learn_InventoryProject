@@ -6,6 +6,7 @@
 
 #include "UObject/Object.h"
 #include "Widgets/Inventory/InventoryBase/Inv_InventoryBase.h"
+#include "Items/Components/Inv_ItemComponent.h"
 
 UInv_InventoryComponent::UInv_InventoryComponent()
 {
@@ -23,9 +24,11 @@ void UInv_InventoryComponent::ConstructInventory()
 {
     OwningPlayerController = Cast<APlayerController>(GetOwner());
     checkf(OwningPlayerController.IsValid(), TEXT("Inventory Component should have a Player Controller as Owner"));
+    checkf(IsValid(InventoryMenuClass), TEXT("Inventory Menu Class should be set"));
 
-    if (!OwningPlayerController->IsLocalController() || !InventoryMenuClass) return;
+    if (!OwningPlayerController->IsLocalController()) return;
 
+    // Create inventory menu widget
     InventoryMenu = CreateWidget<UInv_InventoryBase>(OwningPlayerController.Get(), InventoryMenuClass);
     InventoryMenu->AddToViewport();
 
@@ -46,7 +49,7 @@ void UInv_InventoryComponent::ToggleInventoryMenu()
 
 void UInv_InventoryComponent::OpenInventoryMenu()
 {
-    if (IsValid(InventoryMenu))
+    if (InventoryMenu)
     {
         InventoryMenu->SetVisibility(ESlateVisibility::Visible);
         bInventoryMenuOpen = true;
@@ -76,4 +79,9 @@ void UInv_InventoryComponent::CloseInventoryMenu()
             PC->SetShowMouseCursor(false);
         }
     }
+}
+
+void UInv_InventoryComponent::TryAddItem(UInv_ItemComponent* ItemComponent)
+{
+    NoRoomInInventory.Broadcast();
 }

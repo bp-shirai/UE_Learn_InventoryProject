@@ -32,10 +32,9 @@ protected:
     UFUNCTION(BlueprintCallable, Category = "Inventory")
     void ToggleInventoryMenu();
 
-    
 private:
     void PrimaryInteract();
-    
+
     void CreateHUDWidget();
     void TraceForItem();
 
@@ -57,10 +56,10 @@ private:
     TObjectPtr<UInv_HUDWidget> HUDWidget;
 
     UPROPERTY(EditDefaultsOnly, Category = "Inventory")
-    float TraceLength = 500.f;
+    float TraceLength{500.f};
 
     UPROPERTY(EditDefaultsOnly, Category = "Inventory")
-    TEnumAsByte<ECollisionChannel> ItemTraceChannel = ECC_Visibility;
+    TEnumAsByte<ECollisionChannel> ItemTraceChannel{ECC_Visibility};
 
     TWeakObjectPtr<AActor> ThisActor;
     TWeakObjectPtr<AActor> LastActor;
