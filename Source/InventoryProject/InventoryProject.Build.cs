@@ -18,7 +18,8 @@ public class InventoryProject : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Slate"
+			"Slate",
+
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

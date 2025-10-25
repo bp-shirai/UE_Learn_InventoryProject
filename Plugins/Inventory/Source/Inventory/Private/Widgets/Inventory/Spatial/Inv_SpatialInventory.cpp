@@ -5,7 +5,9 @@
 #include "Components/WidgetSwitcher.h"
 #include "Components/Button.h"
 
+#include "Types/Inv_GridTypes.h"
 #include "Widgets/Inventory/Spatial/Inv_InventoryGrid.h"
+#include "Items/Components/Inv_ItemComponent.h"
 
 void UInv_SpatialInventory::NativeOnInitialized()
 {
@@ -46,4 +48,11 @@ void UInv_SpatialInventory::DisableButton(UButton* Button)
     Button_Consumables->SetIsEnabled(true);
     Button_Craftables->SetIsEnabled(true);
     Button->SetIsEnabled(false);
+}
+
+FInv_SlotAvailabilityResult UInv_SpatialInventory::HasRoomForItem(UInv_ItemComponent* ItemComponent) const
+{
+    FInv_SlotAvailabilityResult Result;
+    Result.TotalRoomToFill = 1;
+    return Result;
 }

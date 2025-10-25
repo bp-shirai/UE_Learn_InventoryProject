@@ -9,12 +9,19 @@
 #include "UObject/Object.h"
 #include "Widgets/Inventory/GridSlots/Inv_GridSlot.h"
 #include "Widgets/Utils/Inv_WidgetUtils.h"
+#include "InventoryManagement/Utils/Inv_InventoryStatics.h"
+#include "Items/Inv_InventoryItem.h"
+#include "InventoryManagement/Components/Inv_InventoryComponent.h"
+
 
 void UInv_InventoryGrid::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
     ConstructGrid();
+
+    InventoryComponent = UInv_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
+    InventoryComponent->OnItemAdded.AddDynamic(this, &ThisClass::AddItem);
 }
 
 void UInv_InventoryGrid::ConstructGrid()
@@ -29,7 +36,7 @@ void UInv_InventoryGrid::ConstructGrid()
         {
             UInv_GridSlot* GridSlot = CreateWidget<UInv_GridSlot>(this, GridSlotClass);
             CanvasPanel->AddChild(GridSlot);
-          
+
             const FIntPoint TilePosition(i, j);
             const int32 Index = UInv_WidgetUtils::GetIndexFromPosition(TilePosition, Columns);
             GridSlot->SetTileIndex(Index);
@@ -38,8 +45,21 @@ void UInv_InventoryGrid::ConstructGrid()
             CanvasSlot->SetSize(FVector2D(TileSize));
             CanvasSlot->SetPosition(TilePosition * TileSize);
 
-            //UE_LOG(LogTemp, Warning, TEXT("%s"), *TilePosition.ToString());
+            // UE_LOG(LogTemp, Warning, TEXT("%s"), *TilePosition.ToString());
             GridSlots.Add(GridSlot);
         }
     }
+}
+
+void UInv_InventoryGrid::AddItem(UInv_InventoryItem* Item)
+{
+    if (!MatchesCategory(Item)) return;
+
+    UE_LOG(LogTemp, Warning, TEXT("InventoryGrid::AddItem InventoryItem=%s"), *Item->GetName());
+
+}
+
+bool UInv_InventoryGrid::MatchesCategory(const UInv_InventoryItem* Item) const
+{
+    return Item->GetItemManifest().GetItemCategory() == ItemCategory;
 }
