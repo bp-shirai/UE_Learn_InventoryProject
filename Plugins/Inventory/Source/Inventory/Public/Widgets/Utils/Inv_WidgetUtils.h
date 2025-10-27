@@ -19,9 +19,11 @@ class INVENTORY_API UInv_WidgetUtils : public UBlueprintFunctionLibrary
     GENERATED_BODY()
 
 public:
-    UFUNCTION(Blueprintable, Category = "Inventory|Utils")
+    UFUNCTION(BlueprintCallable, Category = "Inventory|Utils")
     static int32 GetIndexFromPosition(const FIntPoint& Position, const int32 Columns);
 
-    UFUNCTION(Blueprintable, Category = "Inventory|Utils")
-    static EInv_ItemCategory GetItemCategoryFromItemComponent(const UInv_ItemComponent* ItemComponent);
+    UFUNCTION(BlueprintCallable, Category = "Inventory|Utils")
+    static FIntPoint GetPositionFromIndex(const int32 Index, const int32 Columns);
+
+ 
 };

@@ -61,6 +61,9 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Inventory")
     TEnumAsByte<ECollisionChannel> ItemTraceChannel{ECC_Visibility};
 
+    UPROPERTY()
     TWeakObjectPtr<AActor> ThisActor;
+
+    UPROPERTY()
     TWeakObjectPtr<AActor> LastActor;
 };

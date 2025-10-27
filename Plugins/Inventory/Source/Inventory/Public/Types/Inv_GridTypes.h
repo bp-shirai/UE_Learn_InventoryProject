@@ -33,9 +33,14 @@ struct FInv_SlotAvailabilityResult
 
     FInv_SlotAvailabilityResult() {}
 
+    UPROPERTY()
     TWeakObjectPtr<UInv_InventoryItem> Item; // Is there an item of this type already in the inventory?
+
     int32 TotalRoomToFill{0}; // How much room can we accommodate for?
+
     int32 Remainder{0}; // how much we're going to have left over that can't fit in the inventory?
+
     bool bStackable{false}; // is this a stackable item?
+
     TArray<FInv_SlotAvailability> SlotAvailabilities; // the slot availabilities is an array of more infomation that we have to know
 };
