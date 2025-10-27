@@ -7,6 +7,7 @@
 
 #include "Types/Inv_GridTypes.h"
 #include "Widgets/Inventory/Spatial/Inv_InventoryGrid.h"
+#include "Widgets/Utils/Inv_WidgetUtils.h"
 #include "Items/Components/Inv_ItemComponent.h"
 
 void UInv_SpatialInventory::NativeOnInitialized()
@@ -39,7 +40,7 @@ void UInv_SpatialInventory::SetActiveGrid(UInv_InventoryGrid* Grid, UButton* But
 {
     DisableButton(Button);
 
-   InventorySwitcher->SetActiveWidget(Grid);
+    InventorySwitcher->SetActiveWidget(Grid);
 }
 
 void UInv_SpatialInventory::DisableButton(UButton* Button)
@@ -52,7 +53,11 @@ void UInv_SpatialInventory::DisableButton(UButton* Button)
 
 FInv_SlotAvailabilityResult UInv_SpatialInventory::HasRoomForItem(UInv_ItemComponent* ItemComponent) const
 {
-    FInv_SlotAvailabilityResult Result;
-    Result.TotalRoomToFill = 1;
-    return Result;
+    switch (UInv_WidgetUtils::GetItemCategoryFromItemComponent(ItemComponent))
+    {
+        case EInv_ItemCategory::Equippable: return Grid_Equippables->HasRoomForItem(ItemComponent);
+        case EInv_ItemCategory::Consumable: return Grid_Consumables->HasRoomForItem(ItemComponent);
+        case EInv_ItemCategory::Craftable: return Grid_Craftables->HasRoomForItem(ItemComponent);
+        default: UE_LOG(LogTemp, Error, TEXT("ItemComponent doesn't have a valid Item Category.")); return FInv_SlotAvailabilityResult();
+    }
 }

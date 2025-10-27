@@ -29,9 +29,18 @@ public:
     void SetTotalStackCount(int32 Count) { TotalStackCount = Count; }
 
 private:
-    UPROPERTY(VisibleAnywhere, meta = (BaseStruct = "/Script/Inventory.Inv_ItemManifest"), Replicated, Category = "Inventory")
+    UPROPERTY(Replicated, VisibleAnywhere, meta = (BaseStruct = "/Script/Inventory.Inv_ItemManifest"), Category = "Inventory")
     FInstancedStruct ItemManifest;
 
     UPROPERTY(Replicated)
     int32 TotalStackCount{0};
 };
+
+template <typename FragmentType>
+const FragmentType* GetFragment(const UInv_InventoryItem* Item, const FGameplayTag& Tag)
+{
+    if (!IsValid(Item)) return nullptr;
+
+    const FInv_ItemManifest& Manifest = Item->GetItemManifest();
+    return Manifest.GetFragmentByTag<FragmentType>(Tag);
+}

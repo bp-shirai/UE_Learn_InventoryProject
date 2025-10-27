@@ -4,18 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+
+#include "Types/Inv_GridTypes.h"
+
 #include "Inv_WidgetUtils.generated.h"
 
+class UInv_ItemComponent;
 /**
- * 
+ *
  */
 UCLASS()
 class INVENTORY_API UInv_WidgetUtils : public UBlueprintFunctionLibrary
 {
-	GENERATED_BODY()
-	
-public:
+    GENERATED_BODY()
 
-	UFUNCTION(Blueprintable, Category = "Inventory|Utils")
-	static int32 GetIndexFromPosition(const FIntPoint& Position, const int32 Columns);
+public:
+    UFUNCTION(Blueprintable, Category = "Inventory|Utils")
+    static int32 GetIndexFromPosition(const FIntPoint& Position, const int32 Columns);
+
+    UFUNCTION(Blueprintable, Category = "Inventory|Utils")
+    static EInv_ItemCategory GetItemCategoryFromItemComponent(const UInv_ItemComponent* ItemComponent);
 };

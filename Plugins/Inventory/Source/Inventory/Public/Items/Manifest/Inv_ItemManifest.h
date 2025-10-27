@@ -1,15 +1,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-#include "Types/Inv_GridTypes.h"
 #include "StructUtils/InstancedStruct.h"
 #include "GameplayTagContainer.h"
-#include "Items/Inv_ItemTags.h"
+
+#include "Types/Inv_GridTypes.h"
+// #include "Items/Inv_ItemTags.h"
+// #include "Items/Fragments/Inv_ItemFragment.h"
 
 #include "Inv_ItemManifest.generated.h"
 
 class UInv_InventoryItem;
+struct FInv_ItemFragment;
 
 /**
  * The Item Manifest contains all of the necessary data for creating a new Inventory Item
@@ -28,15 +30,33 @@ struct INVENTORY_API FInv_ItemManifest
     EInv_ItemCategory GetItemCategory() const { return Category; }
     FGameplayTag GetItemType() const { return ItemType; }
 
+    template <typename T>
+        requires std::derived_from<T, FInv_ItemFragment>
+    const T* GetFragmentByTag(const FGameplayTag& FragmentTag) const;
 
 private:
+    UPROPERTY(EditAnywhere, meta = (ExcludeBaseStruct), Category = "Inventory")
+    TArray<TInstancedStruct<FInv_ItemFragment>> Fragments;
+
     UPROPERTY(EditAnywhere, Category = "Inventory")
     EInv_ItemCategory Category{EInv_ItemCategory::None};
 
-    UPROPERTY(EditAnywhere, Category = "Inventory")
+    UPROPERTY(EditAnywhere, meta = (Categories = "GameItems"), Category = "Inventory")
     FGameplayTag ItemType;
 };
 
-// inline UInv_InventoryItem* FInv_ItemManifest::NewManifest(UObject* NewOuter)
-// {
-// }
+template <typename T>
+    requires std::derived_from<T, FInv_ItemFragment>
+const T* FInv_ItemManifest::GetFragmentByTag(const FGameplayTag& FragmentTag) const
+{
+    for (const TInstancedStruct<FInv_ItemFragment>& Fragment : Fragments)
+    {
+        if (const T* FragmentPtr = Fragment.GetPtr<T>())
+        {
+            if (!FragmentPtr->GetFragmentTag().MatchesTagExact(FragmentTag)) continue;
+            return FragmentPtr;
+        }
+    }
+
+    return nullptr;
+}

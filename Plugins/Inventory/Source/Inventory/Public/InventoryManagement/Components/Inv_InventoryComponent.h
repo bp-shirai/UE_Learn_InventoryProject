@@ -66,4 +66,6 @@ private:
     bool bInventoryMenuOpen;
     void OpenInventoryMenu();
     void CloseInventoryMenu();
+
+    void PickupItem(UInv_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
 };
