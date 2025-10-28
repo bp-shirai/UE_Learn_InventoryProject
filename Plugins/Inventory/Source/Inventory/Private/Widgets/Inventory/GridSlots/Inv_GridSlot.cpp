@@ -3,6 +3,8 @@
 
 #include "Widgets/Inventory/GridSlots/Inv_GridSlot.h"
 
+#include "Items/Inv_InventoryItem.h"
+
 #include "Components/Image.h"
 
 
@@ -29,4 +31,9 @@ void UInv_GridSlot::SetGrayedOutTexture()
 {
     GridSlotState = EInv_GridSlotState::GrayedOut;
     Image_GridSlot->SetBrush(Brush_GrayedOut);
+}
+
+void UInv_GridSlot::SetInventoryItem(UInv_InventoryItem* Item)
+{
+    InventoryItem_Ref = Item;
 }

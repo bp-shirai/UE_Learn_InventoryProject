@@ -8,6 +8,7 @@
 
 class UImage;
 class UInv_InventoryItem;
+class UTextBlock;
 
 /**
  *
@@ -29,12 +30,17 @@ public:
     void SetStackable(bool Stackable) { bStackable = Stackable; }
     bool IsStackable() const { return bStackable; }
 
+    void UpdateStackCount(int32 StackCount);
+
 private:
     UPROPERTY()
     TWeakObjectPtr<UInv_InventoryItem> InventoryItem_Ref;
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UImage> Image_Icon;
+
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UTextBlock> Text_StackCount;
 
     int32 GridIndex;
 

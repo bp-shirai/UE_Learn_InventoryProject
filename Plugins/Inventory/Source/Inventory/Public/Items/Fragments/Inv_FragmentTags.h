@@ -6,5 +6,6 @@ namespace FragmentTags
 {
     UE_DECLARE_GAMEPLAY_TAG_EXTERN(Grid);
     UE_DECLARE_GAMEPLAY_TAG_EXTERN(Image);
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Stackable);
 
 }
