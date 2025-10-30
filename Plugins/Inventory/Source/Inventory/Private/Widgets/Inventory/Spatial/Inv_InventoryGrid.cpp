@@ -111,22 +111,32 @@ FInv_SlotAvailabilityResult UInv_InventoryGrid::HasRoomForItem(const FInv_ItemMa
 
         // Can the item fit here? (i.e. is it out of grid bounds?)
         TSet<int32> TentativelyClaimed;
-
         if (!HasRoomAtIndex(GridSlot, GetItemDimensions(Manifest), CheckedIndices, TentativelyClaimed, Manifest.GetItemType(), MaxStackSize))
         {
             continue;
         }
 
-        CheckedIndices.Append(TentativelyClaimed);
-
         // How much to fill?
         const int32 AmountToFillForSlot = DetermineFillAmountForSlot(Result.bStackable, MaxStackSize, AmountToFill, GridSlot);
         if (AmountToFillForSlot == 0) continue;
 
-        // Update the amount left to fill
-    }
+        CheckedIndices.Append(TentativelyClaimed);
 
-    // How much is the Remainder?
+        // Update the amount left to fill
+        Result.TotalRoomToFill += AmountToFillForSlot;
+        Result.SlotAvailabilities.Emplace(
+            FInv_SlotAvailability{
+                HasValidItem(GridSlot) ? GridSlot->GetUpperLeftIndex() : GridSlot->GetIndex(),
+                Result.bStackable ? AmountToFillForSlot : 0,
+                HasValidItem(GridSlot)});
+
+        AmountToFill -= AmountToFillForSlot;
+
+        // How much is the Remainder?
+        Result.Remainder = AmountToFill;
+
+        if (AmountToFill == 0) return Result;
+    }
 
     return Result;
 }
@@ -323,7 +333,7 @@ int32 UInv_InventoryGrid::GetStackAmount(const UInv_GridSlot* GridSlot) const
     if (const int32 UpperLeftIndex = GridSlot->GetUpperLeftIndex(); UpperLeftIndex != INDEX_NONE)
     {
         const UInv_GridSlot* UpperLeftSlot = GridSlots[UpperLeftIndex];
-        CurrentSlotStackCount = UpperLeftSlot->GetStackCount();
+        CurrentSlotStackCount              = UpperLeftSlot->GetStackCount();
     }
 
     return CurrentSlotStackCount;

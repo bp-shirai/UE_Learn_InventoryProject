@@ -6,6 +6,7 @@
 #include "Items/Inv_InventoryItem.h"
 #include "InventoryManagement/Components/Inv_InventoryComponent.h"
 #include "Types/Inv_GridTypes.h"
+#include "UObject/Object.h"
 
 TArray<UInv_InventoryItem*> FInv_InventoryFastArray::GetAllItems() const
 {
@@ -86,4 +87,14 @@ void FInv_InventoryFastArray::RemoveEntry(UInv_InventoryItem* Item)
             break;
         }
     }
+}
+
+UInv_InventoryItem* FInv_InventoryFastArray::FindFirstItemByType(const FGameplayTag& ItemType) const
+{
+    auto FountItem = Entries.FindByPredicate(
+        [ItemType = ItemType](const FInv_InventoryEntry& Entry)
+        {
+            return IsValid(Entry.Item) && Entry.Item->GetItemManifest().GetItemType().MatchesTagExact(ItemType);
+        });
+    return FountItem ? FountItem->Item : nullptr;
 }

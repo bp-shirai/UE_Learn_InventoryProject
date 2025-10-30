@@ -95,6 +95,10 @@ void UInv_InventoryComponent::TryAddItem(UInv_ItemComponent* ItemComponent)
 {
     FInv_SlotAvailabilityResult Result = InventoryMenu->HasRoomForItem(ItemComponent);
 
+    UInv_InventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemComponent->GetItemManifest().GetItemType());
+    Result.Item = FoundItem;
+
+
     if (Result.TotalRoomToFill == 0)
     {
         NoRoomInInventory.Broadcast();

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Net/Serialization/FastArraySerializer.h"
 
+#include "GameplayTagContainer.h"
 
 #include "Inv_FastArray.generated.h"
 
@@ -14,7 +15,7 @@ class UInv_ItemComponent;
 USTRUCT(BlueprintType)
 struct FInv_InventoryEntry : public FFastArraySerializerItem
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
     FInv_InventoryEntry() {}
 
@@ -24,7 +25,6 @@ private:
 
     UPROPERTY()
     TObjectPtr<UInv_InventoryItem> Item = nullptr;
-
 };
 
 //** List of inventory item */
@@ -43,7 +43,7 @@ struct FInv_InventoryFastArray : public FFastArraySerializer
     void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
     // End of FFastArraySerializer contract
 
-    bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms) 
+    bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
     {
         return FastArrayDeltaSerialize<FInv_InventoryEntry, FInv_InventoryFastArray>(Entries, DeltaParms, *this);
     }
@@ -51,24 +51,24 @@ struct FInv_InventoryFastArray : public FFastArraySerializer
     UInv_InventoryItem* AddEntry(UInv_ItemComponent* ItemComponent);
     UInv_InventoryItem* AddEntry(UInv_InventoryItem* Item);
     void RemoveEntry(UInv_InventoryItem* Item);
-
+    UInv_InventoryItem* FindFirstItemByType(const FGameplayTag& ItemType) const;
 
 private:
     friend UInv_InventoryComponent;
-
 
     // Replicated list of items
     UPROPERTY()
     TArray<FInv_InventoryEntry> Entries;
 
-
     UPROPERTY(NotReplicated)
     TObjectPtr<UActorComponent> OwnerComponent;
 };
 
-
-template<>
+template <>
 struct TStructOpsTypeTraits<FInv_InventoryFastArray> : public TStructOpsTypeTraitsBase2<FInv_InventoryFastArray>
 {
-    enum { WithNetDeltaSerializer = true };
+    enum
+    {
+        WithNetDeltaSerializer = true
+    };
 };
