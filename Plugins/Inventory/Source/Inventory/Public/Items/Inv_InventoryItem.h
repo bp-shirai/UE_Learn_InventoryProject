@@ -28,6 +28,9 @@ public:
     int32 GetTotalStackCount() const { return TotalStackCount; }
     void SetTotalStackCount(int32 Count) { TotalStackCount = Count; }
 
+    bool IsStackable() const;
+
+
 private:
     UPROPERTY(Replicated, VisibleAnywhere, meta = (BaseStruct = "/Script/Inventory.Inv_ItemManifest"), Category = "Inventory")
     FInstancedStruct ItemManifest;
