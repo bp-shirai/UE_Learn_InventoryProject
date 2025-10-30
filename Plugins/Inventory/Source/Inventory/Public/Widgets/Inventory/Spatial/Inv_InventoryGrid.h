@@ -30,7 +30,7 @@ public:
     virtual void NativeOnInitialized() override;
 
     EInv_ItemCategory GetItemCategory() const { return ItemCategory; }
-    FInv_SlotAvailabilityResult HasRoomForItem(const UInv_ItemComponent* ItemComponent) const;
+    FInv_SlotAvailabilityResult HasRoomForItem(const UInv_ItemComponent* ItemComponent);
 
     UFUNCTION()
     void AddItem(UInv_InventoryItem* Item);
@@ -40,8 +40,8 @@ private:
 
     void ConstructGrid();
 
-    FInv_SlotAvailabilityResult HasRoomForItem(const UInv_InventoryItem* Item) const;
-    FInv_SlotAvailabilityResult HasRoomForItem(const FInv_ItemManifest& Manifest) const;
+    FInv_SlotAvailabilityResult HasRoomForItem(const UInv_InventoryItem* Item);
+    FInv_SlotAvailabilityResult HasRoomForItem(const FInv_ItemManifest& Manifest);
     void AddItemToIndices(const FInv_SlotAvailabilityResult& Result, UInv_InventoryItem* NewItem);
     bool MatchesCategory(const UInv_InventoryItem* Item) const;
 
@@ -53,6 +53,12 @@ private:
     UInv_SlottedItem* CreateSlottedItem(UInv_InventoryItem* Item, const int32 Index, const bool bStackable, const int32 StackAmount, const FInv_GridFragment* GridFragment, const FInv_ImageFragment* ImageFragment);
     void AddSlottedItemToCanvas(const int32 Index, const FInv_GridFragment* GridFragment, UInv_SlottedItem* SlottedItem);
     void UpdateGridSlots(UInv_InventoryItem* NewItem, const int32 Index, bool bStackableItem, const int32 StackAmount);
+    bool IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const;
+    bool HasRoomAtIndex(const UInv_GridSlot* GridSlot, const FIntPoint& Dimensions, const TSet<int32>& CheckedIndices, TSet<int32>& OutTentativelyClaimed);
+    bool CheckSlotConstraints(const UInv_GridSlot* GridSlot, const UInv_GridSlot* SubGridSlot, const TSet<int32>& CheckedIndices, TSet<int32>& OutTentativelyClaimed) const;
+    FIntPoint GetItemDimensions(const FInv_ItemManifest& Manifest) const;
+    bool HasValidItem(const UInv_GridSlot* GridSlot) const;
+    bool IsUpperLeftSlot(const UInv_GridSlot* GridSlot, const UInv_GridSlot* SubGridSlot) const;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Inventory")
     EInv_ItemCategory ItemCategory;

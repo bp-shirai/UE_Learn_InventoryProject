@@ -9,7 +9,6 @@
 class UImage;
 class UInv_InventoryItem;
 
-
 UENUM(BlueprintType)
 enum class EInv_GridSlotState : uint8
 {
@@ -28,20 +27,18 @@ class INVENTORY_API UInv_GridSlot : public UUserWidget
     GENERATED_BODY()
 
 public:
-    void SetTileIndex(int32 Index) { TileIndex = Index; }
-    int32 GetTileIndex() const { return TileIndex; }
+    void SetIndex(int32 Index) { TileIndex = Index; }
+    int32 GetIndex() const { return TileIndex; }
     EInv_GridSlotState GetGridSlotState() const { return GridSlotState; }
 
     void SetInventoryItem(UInv_InventoryItem* Item);
-    UInv_InventoryItem* GetInventoryItem() const { return InventoryItem_Ref.Get(); } 
+    UInv_InventoryItem* GetInventoryItem() const { return InventoryItem_Ref.Get(); }
     void SetStackCount(int32 Count) { StackCount = Count; }
     int32 GetStackCount() const { return StackCount; }
     void SetUpperLeftIndex(int32 Index) { UpperLeftIndex = Index; }
     int32 GetUpperLeftIndex() const { return UpperLeftIndex; }
     void SetAvailable(bool Available) { bAvailable = Available; }
     bool IsAvailable() const { return bAvailable; }
-
-
 
     void SetUnoccupiedTexture();
     void SetOccupiedTexture();
@@ -56,7 +53,6 @@ private:
 
     UPROPERTY()
     TWeakObjectPtr<UInv_InventoryItem> InventoryItem_Ref;
-
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UImage> Image_GridSlot;
@@ -74,5 +70,4 @@ private:
     FSlateBrush Brush_GrayedOut;
 
     EInv_GridSlotState GridSlotState;
-
 };

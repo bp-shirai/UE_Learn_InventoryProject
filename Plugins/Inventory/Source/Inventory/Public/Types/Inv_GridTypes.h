@@ -23,7 +23,7 @@ struct FInv_SlotAvailability
 
     int32 Index{INDEX_NONE}; // What index are we pitting an item in how much of that item are we filling in, and is there already
     int32 AmountToFill{0};
-    bool bItemAtIndex{false};
+    bool bItemAtIndex{false}; // Is has a boolean for whether or not there's already an item at that index
 };
 
 USTRUCT()

@@ -11,6 +11,7 @@
 #include "Math/MathFwd.h"
 #include "Styling/SlateBrush.h"
 #include "Types/Inv_GridTypes.h"
+#include "UObject/Object.h"
 #include "Widgets/Inventory/GridSlots/Inv_GridSlot.h"
 #include "Widgets/Inventory/SlottedItems/Inv_SlottedItem.h"
 #include "Widgets/Utils/Inv_WidgetUtils.h"
@@ -237,7 +238,7 @@ bool UInv_InventoryGrid::HasRoomAtIndex(const UInv_GridSlot* GridSlot, const FIn
         GridSlots, GridSlot->GetIndex(), Dimensions, Columns,
         [&](UInv_GridSlot* SubGridSlot)
         {
-            if (CheckSlotConstraints(SubGridSlot))
+            if (CheckSlotConstraints(GridSlot, SubGridSlot, CheckedIndices, OutTentativelyClaimed))
             {
                 OutTentativelyClaimed.Add(SubGridSlot->GetIndex());
             }
@@ -256,13 +257,32 @@ FIntPoint UInv_InventoryGrid::GetItemDimensions(const FInv_ItemManifest& Manifes
     return GridFragment ? GridFragment->GetGridSize() : FIntPoint(1, 1);
 }
 
-bool UInv_InventoryGrid::CheckSlotConstraints(const UInv_GridSlot* SubGridSlot) const
+bool UInv_InventoryGrid::CheckSlotConstraints(const UInv_GridSlot* GridSlot, const UInv_GridSlot* SubGridSlot, const TSet<int32>& CheckedIndices, TSet<int32>& OutTentativelyClaimed) const
 {
-    // Check any other important conditions - FroEach2D over a 2D range
     // Index claimed?
+    if (IsIndexClaimed(CheckedIndices, SubGridSlot->GetIndex())) return false;
     // Has valid item?
+    if (!HasValidItem(SubGridSlot))
+    {
+        OutTentativelyClaimed.Add(SubGridSlot->GetIndex());
+        return true;
+    }
+
+    // Is this Grid Slot an upper left slot?
+    if (!IsUpperLeftSlot(GridSlot, SubGridSlot)) return false;
+
     // Is this item the same type as the item we're trying to add?
     // If so, is this a stackable item?
     // If stackable, is this slot at the max stack size already?
     return false;
+}
+
+bool UInv_InventoryGrid::HasValidItem(const UInv_GridSlot* GridSlot) const
+{
+    return IsValid(GridSlot->GetInventoryItem());
+}
+
+bool UInv_InventoryGrid::IsUpperLeftSlot(const UInv_GridSlot* GridSlot, const UInv_GridSlot* SubGridSlot) const
+{
+    return SubGridSlot->GetUpperLeftIndex() == GridSlot->GetIndex();
 }
