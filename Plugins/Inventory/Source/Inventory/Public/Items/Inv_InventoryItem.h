@@ -10,7 +10,7 @@
 #include "Inv_InventoryItem.generated.h"
 
 /**
- *
+ * Inventory Item Instance Class
  */
 UCLASS()
 class INVENTORY_API UInv_InventoryItem : public UObject
@@ -29,7 +29,6 @@ public:
     void SetTotalStackCount(int32 Count) { TotalStackCount = Count; }
 
     bool IsStackable() const;
-
 
 private:
     UPROPERTY(Replicated, VisibleAnywhere, meta = (BaseStruct = "/Script/Inventory.Inv_ItemManifest"), Category = "Inventory")
