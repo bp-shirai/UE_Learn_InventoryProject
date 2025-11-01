@@ -4,6 +4,7 @@
 #include "Components/SlateWrapperTypes.h"
 #include "Engine/EngineBaseTypes.h"
 #include "GameFramework/PlayerController.h"
+#include "Items/Fragments/Inv_ItemFragment.h"
 #include "Net/UnrealNetwork.h"
 
 #include "Items/Inv_InventoryItem.h"
@@ -96,8 +97,7 @@ void UInv_InventoryComponent::TryAddItem(UInv_ItemComponent* ItemComponent)
     FInv_SlotAvailabilityResult Result = InventoryMenu->HasRoomForItem(ItemComponent);
 
     UInv_InventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemComponent->GetItemManifest().GetItemType());
-    Result.Item = FoundItem;
-
+    Result.Item                   = FoundItem;
 
     if (Result.TotalRoomToFill == 0)
     {
@@ -122,6 +122,7 @@ void UInv_InventoryComponent::TryAddItem(UInv_ItemComponent* ItemComponent)
 void UInv_InventoryComponent::Server_AddNewItem_Implementation(UInv_ItemComponent* ItemComponent, int32 StackCount)
 {
     UInv_InventoryItem* NewItem = InventoryList.AddEntry(ItemComponent);
+    NewItem->SetTotalStackCount(StackCount);
 
     if (GetOwner()->GetNetMode() == NM_ListenServer || GetOwner()->GetNetMode() == NM_Standalone)
     {
@@ -129,19 +130,27 @@ void UInv_InventoryComponent::Server_AddNewItem_Implementation(UInv_ItemComponen
     }
 
     // TODO: Tell the Item Component to destroy its owning actor.
-    // PickupItem(ItemComponent, StackCount, Remainder);
+    ItemComponent->PickedUp();
 }
 
 void UInv_InventoryComponent::Server_AddStacksToItem_Implementation(UInv_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder)
 {
-    // const FGameplayTag& ItemType = IsValid(ItemComponent) ? ItemComponent->GetItemManifest().GetItemType() : FGameplayTag::EmptyTag;
-    // UInv_InventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemType);
+    const FGameplayTag& ItemType  = IsValid(ItemComponent) ? ItemComponent->GetItemManifest().GetItemType() : FGameplayTag::EmptyTag;
+    UInv_InventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemType);
+    if (!IsValid(FoundItem)) return;
 
-    // if (!IsValid(FoundItem)) return;
+    FoundItem->SetTotalStackCount(FoundItem->GetTotalStackCount() + StackCount);
 
-    // FoundItem->SetTotalStackCount(FoundItem->GetTotalStackCount() + StackCount);
-
-    // PickupItem(ItemComponent, StackCount, Remainder);
+    // TODO: Destroy the item if the Remainder is zero.
+    // Otherwise, update the stack count for the item pickup.
+    if (Remainder == 0)
+    {
+        ItemComponent->PickedUp();
+    }
+    else if (FInv_StackableFragment* StackableFragment = ItemComponent->GetItemManifest().GetFragmentMutable<FInv_StackableFragment>())
+    {
+        StackableFragment->SetStackCount(Remainder);
+    }
 }
 
 void UInv_InventoryComponent::AddRepSubObj(UObject* SubObj)

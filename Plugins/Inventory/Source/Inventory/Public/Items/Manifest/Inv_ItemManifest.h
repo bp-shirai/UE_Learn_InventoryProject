@@ -16,7 +16,6 @@ struct FInv_ItemFragment;
 /**
  * The Item Manifest contains all of the necessary data for creating a new Inventory Item
  */
-
 USTRUCT(BlueprintType)
 struct INVENTORY_API FInv_ItemManifest
 {
@@ -30,13 +29,14 @@ struct INVENTORY_API FInv_ItemManifest
     EInv_ItemCategory GetItemCategory() const { return Category; }
     FGameplayTag GetItemType() const { return ItemType; }
 
-    template <typename T>
-        requires std::derived_from<T, FInv_ItemFragment>
+    template <typename T> requires std::derived_from<T, FInv_ItemFragment>
     const T* GetFragmentByTag(const FGameplayTag& FragmentTag) const;
 
-    template <typename T>
-        requires std::derived_from<T, FInv_ItemFragment>
+    template <typename T> requires std::derived_from<T, FInv_ItemFragment>
     const T* GetFragment() const;
+
+    template <typename T> requires std::derived_from<T, FInv_ItemFragment>
+    T* GetFragmentMutable();
 
 private:
     UPROPERTY(EditAnywhere, meta = (ExcludeBaseStruct), Category = "Inventory")
@@ -49,8 +49,7 @@ private:
     FGameplayTag ItemType;
 };
 
-template <typename T>
-    requires std::derived_from<T, FInv_ItemFragment>
+template <typename T> requires std::derived_from<T, FInv_ItemFragment>
 const T* FInv_ItemManifest::GetFragmentByTag(const FGameplayTag& FragmentTag) const
 {
     for (const TInstancedStruct<FInv_ItemFragment>& Fragment : Fragments)
@@ -65,14 +64,27 @@ const T* FInv_ItemManifest::GetFragmentByTag(const FGameplayTag& FragmentTag) co
     return nullptr;
 }
 
-template <typename T>
-    requires std::derived_from<T, FInv_ItemFragment>
+template <typename T> requires std::derived_from<T, FInv_ItemFragment>
 const T* FInv_ItemManifest::GetFragment() const
 {
     for (const TInstancedStruct<FInv_ItemFragment>& Fragment : Fragments)
     {
         if (const T* FragmentPtr = Fragment.GetPtr<T>())
-        {  
+        {
+            return FragmentPtr;
+        }
+    }
+
+    return nullptr;
+}
+
+template <typename T> requires std::derived_from<T, FInv_ItemFragment>
+T* FInv_ItemManifest::GetFragmentMutable()
+{
+    for (TInstancedStruct<FInv_ItemFragment>& Fragment : Fragments)
+    {
+        if (T* FragmentPtr = Fragment.GetMutablePtr<T>())
+        {
             return FragmentPtr;
         }
     }

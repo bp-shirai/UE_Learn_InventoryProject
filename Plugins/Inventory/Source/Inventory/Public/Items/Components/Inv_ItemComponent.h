@@ -23,7 +23,13 @@ public:
 
     FString GetPickupMessage() const { return PickupMessage; }
 
+    void PickedUp();
+
 protected:
+    UFUNCTION(BlueprintImplementableEvent, Category = "Inventory")
+    void OnPickedUp();
+
+
 private:
     UPROPERTY(Replicated, EditAnywhere, Category = "Inventory")
     FInv_ItemManifest ItemManifest;
