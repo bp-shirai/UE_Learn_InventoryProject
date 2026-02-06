@@ -1,12 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Inventory.h"
-#include "Logging/LogMacros.h"
 
 #define LOCTEXT_NAMESPACE "FInventoryModule"
 
 DEFINE_LOG_CATEGORY(LogInventory);
-
 
 void FInventoryModule::StartupModule()
 {

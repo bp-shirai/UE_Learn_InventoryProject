@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
 
 #include "Widgets/HUD/Inv_HUDWidget.h"
 
@@ -8,17 +9,17 @@
 
 void UInv_HUDWidget::NativeOnInitialized()
 {
-    Super::NativeOnInitialized();
+	Super::NativeOnInitialized();
 
-    UInv_InventoryComponent* InventoryComponent = UInv_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
-    if(IsValid(InventoryComponent))
-    {
-        InventoryComponent->NoRoomInInventory.AddDynamic(this, &ThisClass::OnNoRoom);
-    }
+	UInv_InventoryComponent* InventoryComponent = UInv_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
+	if (IsValid(InventoryComponent))
+	{
+		InventoryComponent->NoRoomInInventory.AddDynamic(this, &UInv_HUDWidget::OnNoRoom);
+	}
 }
 
 void UInv_HUDWidget::OnNoRoom()
 {
-    if(!IsValid(InfoMessage)) return;
-    InfoMessage->SetMessage(FText::FromString(TEXT("No Room In Inventory.")));
+	if (!IsValid(InfoMessage)) return;
+	InfoMessage->SetMessage(FText::FromString("No Room In Inventory."));
 }

@@ -38,6 +38,7 @@ public class Inventory : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"InputCore",
 				"CoreUObject",
 				"Engine",
 				"Slate",

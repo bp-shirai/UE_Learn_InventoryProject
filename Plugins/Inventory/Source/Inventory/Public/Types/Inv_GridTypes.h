@@ -7,40 +7,80 @@ class UInv_InventoryItem;
 UENUM(BlueprintType)
 enum class EInv_ItemCategory : uint8
 {
-    Equippable,
-    Consumable,
-    Craftable,
-    None,
+	Equippable,
+	Consumable,
+	Craftable,
+	None
 };
 
 USTRUCT()
 struct FInv_SlotAvailability
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
-    FInv_SlotAvailability() {}
-    FInv_SlotAvailability(int32 ItemIndex, int32 Room, bool bHasItem) : Index(ItemIndex), AmountToFill(Room), bItemAtIndex(bHasItem) {}
+	FInv_SlotAvailability() {}
+	FInv_SlotAvailability(int32 ItemIndex, int32 Room, bool bHasItem) : Index(ItemIndex), AmountToFill(Room), bItemAtIndex(bHasItem) {}
 
-    int32 Index{INDEX_NONE}; // What index are we pitting an item in how much of that item are we filling in, and is there already
-    int32 AmountToFill{0};
-    bool bItemAtIndex{false}; // Is has a boolean for whether or not there's already an item at that index
+	int32 Index{INDEX_NONE};
+	int32 AmountToFill{0};
+	bool bItemAtIndex{false};
 };
 
 USTRUCT()
 struct FInv_SlotAvailabilityResult
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
-    FInv_SlotAvailabilityResult() {}
+	FInv_SlotAvailabilityResult() {}
 
-    UPROPERTY()
-    TWeakObjectPtr<UInv_InventoryItem> Item; // Is there an item of this type already in the inventory?
+	TWeakObjectPtr<UInv_InventoryItem> Item;
+	int32 TotalRoomToFill{0};
+	int32 Remainder{0};
+	bool bStackable{false};
+	TArray<FInv_SlotAvailability> SlotAvailabilities;
+};
 
-    int32 TotalRoomToFill{0}; // How much room can we accommodate for?
+UENUM(BlueprintType)
+enum class EInv_TileQuadrant : uint8
+{
+	TopLeft,
+	TopRight,
+	BottomLeft,
+	BottomRight,
+	None
+};
 
-    int32 Remainder{0}; // how much we're going to have left over that can't fit in the inventory?
+USTRUCT(BlueprintType)
+struct FInv_TileParameters
+{
+	GENERATED_BODY()
 
-    bool bStackable{false}; // is this a stackable item?
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Inventory")
+	FIntPoint TileCoordinats{};
 
-    TArray<FInv_SlotAvailability> SlotAvailabilities; // the slot availabilities is an array of more infomation that we have to know
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Inventory")
+	int32 TileIndex{INDEX_NONE};
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Inventory")
+	EInv_TileQuadrant TileQuadrant{EInv_TileQuadrant::None};
+};
+
+inline bool operator==(const FInv_TileParameters& A, const FInv_TileParameters& B)
+{
+	return A.TileCoordinats == B.TileCoordinats && A.TileIndex == B.TileIndex && A.TileQuadrant == B.TileQuadrant;
+}
+
+USTRUCT()
+struct FInv_SpaceQueryResult
+{
+	GENERATED_BODY()
+
+	// True if the space queried has no items in it
+	bool bHasSpace{false};
+
+	// Valid if there's a single item we can swap with
+	TWeakObjectPtr<UInv_InventoryItem> ValidItem = nullptr;
+
+	// Upper left index of the valid item, if there is one
+	int32 UpperLeftIndex{INDEX_NONE};
 };
